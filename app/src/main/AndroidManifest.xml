@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="com.kanedias.vanilla.audiotag"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@drawable/icon"
+        android:supportsRtl="true"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.kanedias.vanilla.audiotag.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_filepaths" />
+        </provider>
+
+        <receiver
+            android:name=".PluginQueryBroadcastReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="ch.blinkenlights.android.vanilla.action.REQUEST_PLUGIN_PARAMS"/>
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".TagEditActivity"
+            android:theme="@style/DialogTheme"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="ch.blinkenlights.android.vanilla.action.WAKE_PLUGIN"/>
+                <action android:name="ch.blinkenlights.android.vanilla.action.LAUNCH_PLUGIN"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
