@@ -1,16 +1,17 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.triplet.play'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
 
     defaultConfig {
-        applicationId "com.kanedias.vanilla.audiotag"
+        applicationId "com.kanedias.vanilla.metadata"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 16
-        versionName "1.3.0"
+        versionCode 1
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -52,5 +53,9 @@ play {
 
 dependencies {
     implementation project(':plugin-commons') // SAF storage access utilities
-    implementation 'com.github.Adonai:jaudiotagger-android:2.2.6-6-kanedias' // build from https://bitbucket.org/ijabz/jaudiotagger (LGPL)
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"     // Kotlin language support
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0"        // Kotlin coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0"     // Kotlin UI context
+    implementation 'com.github.QuickLyric:fpcalc-android:1.0.2b'                 // convert audiofile to fingerprint
+    implementation 'com.google.code.gson:gson:2.8.5'                            //
 }

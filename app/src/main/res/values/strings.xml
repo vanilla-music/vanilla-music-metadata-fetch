@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vanilla Tag Editor</string>
-    <string name="tag_editor">Tag editor</string>
-    <string name="plugin_desc">Allows you to edit the embedded tags of an MP3/OGG/FLAC files</string>
+    <string name="app_name">Vanilla Metadata Fetch</string>
+    <string name="metadata_fetch">Metadata fetch</string>
+    <string name="plugin_desc">Allows you to fetch metadata of unknown songs by their fingerprint</string>
     <string name="song_title">Song title</string>
     <string name="song_artist">Song artist</string>
     <string name="song_album">Song album</string>
@@ -13,7 +13,9 @@
     <string name="invalid_tag_requested">Invalid tag requested</string>
     <string name="invalid_artwork_provided">Invalid artwork provided</string>
     <string name="re_tag">Re-tag</string>
-    <string name="id3_v22_to_v24">Do you want to re-tag ID3 v2.2 to v2.4 in this file for better compatibility?</string>
     <string name="reload">Reload</string>
-    <string name="not_supported_use_other_plugin">Cannot write text data to such tag, try using other plugins</string>
+    <string name="write">Write…</string>
+    <string name="song_cover">Song cover</string>
+    <string name="acoustid_status_invalid">Acoustid returned invalid status</string>
+    <string name="acoustid_no_results">No results found for this file</string>
 </resources>

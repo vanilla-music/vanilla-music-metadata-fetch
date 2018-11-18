@@ -1,27 +1,27 @@
-# Vanilla Music player Tag Editor plugin
+# Vanilla Music player Metadata fetch plugin
 
 This repository hosts plugin for Vanilla Music.
 Prior to use it you should have [Vanilla Music player](https://github.com/vanilla-music/vanilla) installed
 
-Once both player and this plugin are installed, request a context menu from library screen, select "Plugins" and "Tag editor" afterwards.
+Once both player and this plugin are installed, request a context menu from library screen, select "Plugins" and "Metadata fetch" afterwards.
 
 # Features
 
-* Tag editing of multiple audiofile formats (mp3/ogg/flac)
-* Custom tag editing (lyrics, track number, comment etc.)
-* Lightweight (640 KB in release apk)
+* Fetches tag metadata for various music files (mp3/ogg/flac)
+* Can fetch also cover for selected song
+* Can write retrieved cover and tags if [Tag Plugin](https://github.com/vanilla-music/vanilla-music-tag-editor) is installed
 
 # Donate
 
 [<img alt="Patreon Page" src="https://s3.amazonaws.com/patreon_public_assets/toolbox/patreon.png" height="100"/>](https://www.patreon.com/kanedias)
 
-# WIP
+# Known issues
 
-* make this plugin work with custom (non-VanillaMusic) intents
+* If your phone is x86 and this plugin doesn't work on any of the songs, please create an issue here
 
 # License
 
-    Copyright (C) 2016-2018 Oleg "Kanedias" Chernovskiy
+    Copyright (C) 2018 Oleg "Kanedias" Chernovskiy
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

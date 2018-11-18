@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true">
+
+    <ImageView
+        android:id="@+id/meta_song_cover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/song_cover" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/border">
+
+        <TextView
+            android:id="@+id/meta_song_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableLeft="@drawable/song"
+            android:drawableStart="@drawable/song"
+            android:drawablePadding="4dp"/>
+
+        <TextView
+            android:id="@+id/meta_song_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableLeft="@drawable/artist"
+            android:drawableStart="@drawable/artist"
+            android:drawablePadding="4dp"/>
+
+        <TextView
+            android:id="@+id/meta_song_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableLeft="@drawable/album"
+            android:drawableStart="@drawable/album"
+            android:drawablePadding="4dp"/>
+
+        <TextView
+            android:id="@+id/meta_song_country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableLeft="@drawable/country"
+            android:drawableStart="@drawable/country"
+            android:drawablePadding="4dp"/>
+
+        <TextView
+            android:id="@+id/meta_song_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:drawableLeft="@drawable/year"
+            android:drawableStart="@drawable/year"
+            android:drawablePadding="4dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

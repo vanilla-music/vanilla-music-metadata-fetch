@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:tools="http://schemas.android.com/tools"
-    package="com.kanedias.vanilla.audiotag"
+    package="com.kanedias.vanilla.metadata"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.kanedias.vanilla.audiotag.fileprovider"
+            android:authorities="com.kanedias.vanilla.metadata.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
@@ -30,7 +31,7 @@
         </receiver>
 
         <activity
-            android:name=".TagEditActivity"
+            android:name=".MetadataFetchActivity"
             android:theme="@style/DialogTheme"
             android:excludeFromRecents="true">
             <intent-filter>
