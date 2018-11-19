@@ -85,7 +85,7 @@ data class Release(
         val date: ReleaseDate?,
         val artists: List<Artist>,
         @SerializedName("releaseevents")
-        val releaseEvents: List<ReleaseEvent>,
+        val releaseEvents: List<ReleaseEvent>?,
         @SerializedName("track_count")
         val trackCount: Int?,
         @SerializedName("medium_count")

@@ -105,7 +105,7 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
     fun loadCover() {
         val releases = metadata?.results?.firstOrNull()?.recordings?.firstOrNull()?.releases ?: return
 
-        for (release in releases) {
+        for (release in releases.shuffled()) {
             val coverAddress = Uri.parse(COVERART_API_ENDPOINT).buildUpon()
                     .appendPath("release")
                     .appendPath(release.id)
@@ -114,7 +114,8 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
             try {
                 cover = URL(coverAddress.toString()).openStream().readBytes()
             } catch (ex: IOException) {
-                Log.d(LOG_TAG, "Couldn't load cover for release ${release.title}: ${release.id}", ex)
+                // swallow exception, there are quite a lot of missed covers
+                Log.d(LOG_TAG, "Couldn't load cover for release ${release.title}: ${release.id}")
                 continue
             }
         }
@@ -127,6 +128,10 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
         return true
     }
 
+    /**
+     * Write cover to the file through the Tag Editor plugin
+     * @param ctx activity to pass intent through
+     */
     private fun writeCover(ctx: Activity) {
         if (cover == null)
             return
@@ -169,11 +174,15 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
         }
     }
 
+    /**
+     * Write metadata through the Tag Editor plugin
+     * @param ctx activity to pass intent through
+     */
     private fun writeMeta(ctx: Activity) {
         val result = metadata?.results?.first()?.recordings?.first() ?: return
 
         val releaseArtists = result.releases?.flatMap { it.artists }
-        val releaseEvents = result.releases?.flatMap { it.releaseEvents }
+        val releaseEvents = result.releases?.flatMap { it.releaseEvents.orEmpty() }
         val trackArtists = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
         val tracks = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }
 

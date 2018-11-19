@@ -16,10 +16,8 @@
  */
 package com.kanedias.vanilla.metadata
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.content.Context
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.Intent
-import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.TextUtils
@@ -30,7 +28,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import com.kanedias.vanilla.plugins.DialogActivity
-import com.kanedias.vanilla.plugins.PluginConstants
 import com.kanedias.vanilla.plugins.PluginConstants.*
 import com.kanedias.vanilla.plugins.PluginUtils
 import kotlinx.coroutines.Dispatchers
@@ -38,11 +35,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.IOException
-import android.graphics.Matrix.ScaleToFit
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import android.graphics.RectF
-
+import com.kanedias.vanilla.plugins.PluginUtils.havePermissions
 
 
 /**
@@ -180,8 +173,13 @@ class MetadataFetchActivity : DialogActivity() {
     override fun onResume() {
         super.onResume()
 
+        if (!title.text.isNullOrEmpty()) {
+            // metadata was already extracted
+            return
+        }
+
         // onResume will fire both on first launch and on return from permission request
-        if (!PluginUtils.checkAndRequestPermissions(this, WRITE_EXTERNAL_STORAGE)) {
+        if (!PluginUtils.checkAndRequestPermissions(this, READ_EXTERNAL_STORAGE)) {
             return
         }
 
@@ -195,6 +193,16 @@ class MetadataFetchActivity : DialogActivity() {
         // if we're here the user requested the metadata plugin directly
         if (mWrapper.loadFile()) {
             extractMetadata()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // we only request one permission
+        if (!havePermissions(this, READ_EXTERNAL_STORAGE)) {
+            // user denied our request, can't continue
+            finish()
         }
     }
 
@@ -243,7 +251,7 @@ class MetadataFetchActivity : DialogActivity() {
         val allReleaseArtists = result.releases?.flatMap { it.artists }
         val allTrackArtists = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
         val allTrackTitles = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }
-        val allReleaseEvents = result.releases?.flatMap { it.releaseEvents }
+        val allReleaseEvents = result.releases?.flatMap { it.releaseEvents.orEmpty() }
 
         title.text = result.title
                 ?: allTrackTitles?.map { it.title }?.firstOrNull()
