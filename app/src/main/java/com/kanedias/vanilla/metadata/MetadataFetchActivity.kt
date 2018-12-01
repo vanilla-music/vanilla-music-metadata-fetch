@@ -30,12 +30,9 @@ import android.widget.*
 import com.kanedias.vanilla.plugins.DialogActivity
 import com.kanedias.vanilla.plugins.PluginConstants.*
 import com.kanedias.vanilla.plugins.PluginUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.io.IOException
 import com.kanedias.vanilla.plugins.PluginUtils.havePermissions
+import kotlinx.coroutines.*
 
 
 /**
@@ -99,7 +96,7 @@ class MetadataFetchActivity : DialogActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mWrapper = PluginMetadataWrapper(intent, this)
+        mWrapper = PluginMetadataWrapper(intent)
         if (handleLaunchPlugin()) {
             // no UI was required for handling the intent
             return
@@ -220,8 +217,8 @@ class MetadataFetchActivity : DialogActivity() {
                 mWrapper.loadCover()
 
                 // show on the screen
-                async(Dispatchers.Main) { handleCoverartAnswer(mWrapper.cover) }
-                async(Dispatchers.Main) { handleAcoustidAnswer(mWrapper.metadata) }
+                withContext(Dispatchers.Main) { handleCoverartAnswer(mWrapper.cover) }
+                withContext(Dispatchers.Main) { handleAcoustidAnswer(mWrapper.metadata) }
             } catch (ex: IOException) {
                 Log.e(LOG_TAG, "Exception while loading metadata from AcoustID", ex)
             }
@@ -246,12 +243,13 @@ class MetadataFetchActivity : DialogActivity() {
             return
         }
 
-        val result = data.results.first().recordings.first()
+        val result = data.results.first().recordings!!.first()
+        val releases = result.releaseGroups?.flatMap { it.releases.orEmpty() }
 
-        val allReleaseArtists = result.releases?.flatMap { it.artists }
-        val allTrackArtists = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
-        val allTrackTitles = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }
-        val allReleaseEvents = result.releases?.flatMap { it.releaseEvents.orEmpty() }
+        val allReleaseArtists = releases?.flatMap { it.artists }
+        val allTrackArtists = releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
+        val allTrackTitles = releases?.flatMap { it.mediums }?.flatMap { it.tracks }
+        val allReleaseEvents = releases?.flatMap { it.releaseEvents.orEmpty() }
 
         title.text = result.title
                 ?: allTrackTitles?.map { it.title }?.firstOrNull()
@@ -260,9 +258,9 @@ class MetadataFetchActivity : DialogActivity() {
                 ?: allReleaseArtists?.map { it.name }?.firstOrNull()
                 ?: allTrackArtists?.map { it.name }?.firstOrNull()
 
-        album.text = result.releases?.map { it.title }?.firstOrNull()
+        album.text = releases?.map { it.title }?.firstOrNull()
 
-        country.text = result.releases?.map { it.country }?.firstOrNull()
+        country.text = releases?.map { it.country }?.firstOrNull()
 
         year.text = allReleaseEvents?.mapNotNull { it.date }?.map { it.year }?.firstOrNull()?.toString()
 

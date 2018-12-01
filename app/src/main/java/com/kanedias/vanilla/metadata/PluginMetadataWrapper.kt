@@ -17,12 +17,8 @@
 package com.kanedias.vanilla.metadata
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
 import android.util.Log
 import com.geecko.fpcalc.FpCalc
@@ -32,6 +28,7 @@ import com.kanedias.vanilla.plugins.PluginConstants
 import com.kanedias.vanilla.plugins.PluginConstants.*
 import java.io.*
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -44,7 +41,7 @@ import kotlin.math.roundToInt
  *
  * @author Oleg Chernovskiy
  */
-class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mContext: Activity) {
+class PluginMetadataWrapper(private val mLaunchIntent: Intent) {
 
     companion object {
         private const val ACOUSTID_API_ENDPOINT = "https://api.acoustid.org/v2/lookup"
@@ -86,16 +83,20 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
         val fgData = Gson().fromJson(fgJson, FpCalcFingerprint::class.java)
 
         val mdAddress = Uri.parse(ACOUSTID_API_ENDPOINT).buildUpon()
-                .encodedQuery("meta=recordings+releases+tracks")
+                .encodedQuery("meta=recordings+releasegroups+releases+tracks")
                 .appendQueryParameter("format", "json")
                 .appendQueryParameter("client", META_SEARCH_API_KEY)
                 .appendQueryParameter("duration", fgData.duration.toFloat().roundToInt().toString())
                 .appendQueryParameter("fingerprint", fgData.fingerprint)
                 .build()
 
-        val stream = URL(mdAddress.toString()).openStream()
-        val answerJson = InputStreamReader(stream, "UTF-8").readText()
-        metadata = Gson().fromJson<SongMetadata>(answerJson, SongMetadata::class.java)
+        try {
+            URL(mdAddress.toString()).openStream().reader().use {
+                metadata = Gson().fromJson<SongMetadata>(it.readText(), SongMetadata::class.java)
+            }
+        } catch (ex: IOException) {
+            Log.e(LOG_TAG, "Couldn't load metadata for the file $mAudioFile")
+        }
     }
 
     /**
@@ -103,7 +104,33 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
      * Launch this in IO thread, not in UI thread.
      */
     fun loadCover() {
-        val releases = metadata?.results?.firstOrNull()?.recordings?.firstOrNull()?.releases ?: return
+        val releaseGroups = metadata?.results
+                ?.flatMap { it.recordings.orEmpty() }
+                ?.flatMap { it.releaseGroups.orEmpty() } ?: return
+
+        for (rg in releaseGroups.shuffled()) {
+            val coverAddress = Uri.parse(COVERART_API_ENDPOINT).buildUpon()
+                    .appendPath("release-group")
+                    .appendPath(rg.id)
+                    .appendPath("front-500")
+
+            try {
+                URL(coverAddress.toString()).openStream().use {
+                    cover = it.readBytes()
+                }
+                return
+            } catch (ex: IOException) {
+                // swallow exception, there are quite a lot of missed covers
+                Log.d(LOG_TAG, "Couldn't load cover for release group ${rg.title} (${rg.id})")
+                continue
+            }
+        }
+
+        // didn't find cover by release group, try release instead
+        val releases = metadata?.results
+                ?.flatMap { it.recordings.orEmpty() }
+                ?.flatMap { it.releaseGroups.orEmpty() }
+                ?.flatMap { it.releases.orEmpty() } ?: return
 
         for (release in releases.shuffled()) {
             val coverAddress = Uri.parse(COVERART_API_ENDPOINT).buildUpon()
@@ -112,10 +139,13 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
                     .appendPath("front-500")
 
             try {
-                cover = URL(coverAddress.toString()).openStream().readBytes()
+                URL(coverAddress.toString()).openStream().use {
+                    cover = it.readBytes()
+                }
+                return
             } catch (ex: IOException) {
                 // swallow exception, there are quite a lot of missed covers
-                Log.d(LOG_TAG, "Couldn't load cover for release ${release.title}: ${release.id}")
+                Log.d(LOG_TAG, "Couldn't load cover for release ${release.title} (${release.id})")
                 continue
             }
         }
@@ -181,10 +211,15 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
     private fun writeMeta(ctx: Activity) {
         val result = metadata?.results?.first()?.recordings?.first() ?: return
 
-        val releaseArtists = result.releases?.flatMap { it.artists }
-        val releaseEvents = result.releases?.flatMap { it.releaseEvents.orEmpty() }
-        val trackArtists = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
-        val tracks = result.releases?.flatMap { it.mediums }?.flatMap { it.tracks }
+        val rgArtists = result.releaseGroups?.flatMap { it.artists.orEmpty() }
+        val releases = result.releaseGroups?.flatMap { it.releases.orEmpty() }
+
+        // all release artists, events, track artists and tracks among them
+        // metadata is already filtered on fetch to show only related tracks/artists and so on
+        val releaseArtists = releases?.flatMap { it.artists }
+        val releaseEvents = releases?.flatMap { it.releaseEvents.orEmpty() }
+        val trackArtists = releases?.flatMap { it.mediums }?.flatMap { it.tracks }?.flatMap { it.artists }
+        val tracks = releases?.flatMap { it.mediums }?.flatMap { it.tracks }
 
         val request = Intent(ACTION_LAUNCH_PLUGIN)
         request.setPackage(PLUGIN_TAG_EDIT_PKG)
@@ -203,20 +238,27 @@ class PluginMetadataWrapper(private val mLaunchIntent: Intent, private val mCont
         request.putExtra(EXTRA_PARAM_P2P_VAL, arrayOf<String>(
                 // track priority: first found track title -> first found recording title
                 tracks?.firstOrNull()?.title ?: result.title.orEmpty(),
-                // artist priority: first found recording artist -> first found  track artist
-                result.artists?.map { it.name }?.firstOrNull() ?: trackArtists?.map { it.name }?.firstOrNull().orEmpty(),
-                // album priority: first found release title
-                result.releases?.mapNotNull { it.title }?.firstOrNull().orEmpty(),
+                // artist priority: first found recording artist
+                //      -> first found release group artist
+                //          -> first found album artist
+                //              -> first found  track artist
+                result.artists?.map { it.name }?.firstOrNull()
+                        ?: rgArtists?.map { it.name }?.firstOrNull()
+                        ?: releaseArtists?.mapNotNull { it.name }?.firstOrNull()
+                        ?: trackArtists?.map { it.name }?.firstOrNull().orEmpty(),
+                // album priority: release group title -> first found release title
+                result.releaseGroups?.mapNotNull { it.title }?.firstOrNull()
+                        ?: releases?.mapNotNull { it.title }?.firstOrNull().orEmpty(),
                 // album artist priority: first found release artist
                 releaseArtists?.mapNotNull { it.name }?.firstOrNull().orEmpty(),
                 // year priority: first found release date
                 releaseEvents?.mapNotNull { it.date }?.map { it.year }?.firstOrNull()?.toString().orEmpty(),
                 // country priority: first found release country
-                result.releases?.map { it.country }?.firstOrNull().orEmpty(),
+                releases?.map { it.country }?.firstOrNull().orEmpty(),
                 // track pos priority: first found track position
                 tracks?.firstOrNull()?.position?.toString().orEmpty(),
                 // track total priority: first found release track total
-                result.releases?.mapNotNull { it.trackCount }?.firstOrNull()?.toString().orEmpty()))
+                releases?.mapNotNull { it.trackCount }?.firstOrNull()?.toString().orEmpty()))
         ctx.startActivity(request)
     }
 }

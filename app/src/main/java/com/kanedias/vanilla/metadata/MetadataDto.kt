@@ -39,7 +39,7 @@ data class FpCalcFingerprint(val duration: String, val fingerprint: String)
  *     "id": "9ff43b6a-4f16-427c-93c2-92307ca505e0",
  *     "recordings": [{
  *       "duration": 639,
- *       "releasegroups": [{
+ *       "releaseGroups": [{
  *         "type": "Album",
  *         "id": "ddaa2d4d-314e-3e7c-b1d0-f6d207f5aa2f",
  *         "title": "Before the Dawn Heals Us"
@@ -67,15 +67,24 @@ data class SongMetadata(
 data class Match(
         val id: String,
         val score: Float,
-        val recordings: List<Recording>
+        val recordings: List<Recording>?
 )
 
 data class Recording(
         val id: String,
         val duration: String,
         val title: String?,
-        val releases: List<Release>?,
+        @SerializedName("releasegroups")
+        val releaseGroups: List<ReleaseGroup>?,
         val artists: List<Artist>?
+)
+
+data class ReleaseGroup(
+        val id: String,
+        val title: String?,
+        val type: String?,
+        val artists: List<Artist>?,
+        val releases: List<Release>?
 )
 
 data class Release(
