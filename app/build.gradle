@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.triplet.play'
 
+import static org.apache.tools.ant.taskdefs.condition.Os.*
+
 android {
     compileSdkVersion 28
 
@@ -10,8 +12,8 @@ android {
         applicationId "com.kanedias.vanilla.metadata"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -63,17 +65,25 @@ android {
     }
 }
 
-task traceCommitsToReleaseNotes(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
-    file = new File('src/main/play/release-notes/en-US/default.txt')
-    fromRef = "1.0.0"
-    toRef = android.defaultConfig.versionName
-    templateContent = """
-        {{#commits}}
-        - {{{message}}}
-        {{/commits}}
-    """.stripMargin()
+task populateChangelog {
+    doLast {
+        def prevTag = ['git',  'describe', '--tags', '--abbrev=0', 'HEAD~'].execute()
+        prevTag.waitFor()
+        def log = ['git', 'log', '--format=- %s (%an)', "${prevTag.in.readLines().first()}..HEAD"].execute()
+        log.waitFor()
+
+        def cleanup = ['git', 'checkout', 'app/src/main/play/release-notes'].execute()
+        cleanup.waitFor()
+        println cleanup.err.text
+
+        def changelog = file("src/main/play/release-notes/en-US/default.txt")
+        changelog.text += "\n" + log.in.text
+    }
 }
-publish.dependsOn traceCommitsToReleaseNotes
+
+if (isFamily(FAMILY_UNIX)) {
+    publish.dependsOn populateChangelog
+}
 
 
 play {
@@ -86,6 +96,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"     // Kotlin language support
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0"        // Kotlin coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0"     // Kotlin UI context
-    implementation 'com.github.QuickLyric:fpcalc-android:1.0.2b'                 // convert audiofile to fingerprint
-    implementation 'com.google.code.gson:gson:2.8.5'                            //
+    implementation 'com.github.QuickLyric:fpcalc-android:1.0.2b'                // convert audiofile to fingerprint
+    implementation 'com.google.code.gson:gson:2.8.5'                            // Google JSON ORM library
 }

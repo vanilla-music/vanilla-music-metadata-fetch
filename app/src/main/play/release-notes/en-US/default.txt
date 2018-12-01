@@ -1,1 +1,2 @@
 Initial Google Play release, all features included
+- Add Travis build, add GPlay integration (Oleg Chernovskiy)
