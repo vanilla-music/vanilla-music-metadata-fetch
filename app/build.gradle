@@ -1,7 +1,9 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.github.triplet.play'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'com.github.triplet.play' version '2.3.0'
+}
 
 import static org.apache.tools.ant.taskdefs.condition.Os.*
 
@@ -92,10 +94,11 @@ play {
 }
 
 dependencies {
-    implementation project(':plugin-commons') // SAF storage access utilities
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"     // Kotlin language support
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0"        // Kotlin coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0"     // Kotlin UI context
-    implementation 'com.github.QuickLyric:fpcalc-android:1.0.2b'                // convert audiofile to fingerprint
-    implementation 'com.google.code.gson:gson:2.8.5'                            // Google JSON ORM library
+    implementation 'com.github.vanilla-music:vanilla-music-plugin-commons:1.0.3' // SAF storage access utilities
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"      // Kotlin language support
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"         // Kotlin coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"      // Kotlin UI context
+    implementation 'androidx.core:core:1.0.2'                                    // Android FileProvider
+    implementation 'com.github.QuickLyric:fpcalc-android:1.0.2b'                 // convert audiofile to fingerprint
+    implementation 'com.google.code.gson:gson:2.8.5'                             // Google JSON ORM library
 }

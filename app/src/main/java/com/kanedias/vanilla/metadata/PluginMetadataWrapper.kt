@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Oleg `Kanedias` Chernovskiy <adonai@xaker.ru>
+ * Copyright (C) 2018-2019 Oleg `Kanedias` Chernovskiy <adonai@xaker.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.kanedias.vanilla.metadata
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 import android.util.Log
 import com.geecko.fpcalc.FpCalc
 import com.google.gson.Gson
@@ -28,7 +28,6 @@ import com.kanedias.vanilla.plugins.PluginConstants
 import com.kanedias.vanilla.plugins.PluginConstants.*
 import java.io.*
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.math.roundToInt
 
