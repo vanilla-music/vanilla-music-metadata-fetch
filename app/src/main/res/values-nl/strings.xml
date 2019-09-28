@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vanilla Metadata Ophalen</string>
+    <string name="metadata_fetch">Metadata ophalen</string>
+    <string name="plugin_desc">Haal metadata op van onbekende nummers via alleen hun vingerafdruk</string>
+    <string name="song_title">Titel van nummer</string>
+    <string name="song_artist">Artiest van nummer</string>
+    <string name="song_album">Album van nummer</string>
+    <string name="confirm">Bevestig</string>
+    <string name="select_custom_tag">Kies een maatwerktag…</string>
+    <string name="error_audio_file">Fout tijdens werken met audiobestand %s</string>
+    <string name="file_written_successfully">Bestand is succesvol weggeschreven!</string>
+    <string name="invalid_tag_requested">Ongeldige tag was opgevraagd</string>
+    <string name="invalid_artwork_provided">Ongeldig artwork aangeleverd</string>
+    <string name="re_tag">Her-tag</string>
+    <string name="reload">Herlaad</string>
+    <string name="write">Schrijf…</string>
+    <string name="song_cover">Artwork van nummer</string>
+    <string name="acoustid_status_invalid">AcoustID gaf een ongeldige status terug</string>
+    <string name="acoustid_no_results">Voor dit bestand zijn geen resultaten gevonden</string>
+</resources>
