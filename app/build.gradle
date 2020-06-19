@@ -8,14 +8,15 @@ plugins {
 import static org.apache.tools.ant.taskdefs.condition.Os.*
 
 android {
+    ndkVersion "21.3.6528147"
     compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.kanedias.vanilla.metadata"
         minSdkVersion 14
         targetSdkVersion 29
-        versionCode 7
-        versionName "1.0.6"
+        versionCode 8
+        versionName "1.0.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
