@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vanilla Metadata Ophalen</string>
+    <string name="app_name">Metadata Ophalen</string>
     <string name="metadata_fetch">Metadata ophalen</string>
     <string name="plugin_desc">Haal metadata op van onbekende nummers via alleen hun vingerafdruk</string>
     <string name="song_title">Titel van nummer</string>

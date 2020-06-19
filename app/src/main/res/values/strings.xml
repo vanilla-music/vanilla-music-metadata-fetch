@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vanilla Metadata Fetch</string>
-    <string name="metadata_fetch">Metadata fetch</string>
+    <string name="app_name">Metadata Fetcher</string>
+    <string name="metadata_fetch">Metadata fetcher</string>
     <string name="plugin_desc">Allows you to fetch metadata of unknown songs by their fingerprint</string>
     <string name="song_title">Song title</string>
     <string name="song_artist">Song artist</string>
