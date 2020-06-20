@@ -15,8 +15,8 @@ android {
         applicationId "com.kanedias.vanilla.metadata"
         minSdkVersion 14
         targetSdkVersion 29
-        versionCode 8
-        versionName "1.0.7"
+        versionCode 9
+        versionName "1.0.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -56,7 +56,7 @@ android {
             enable true
             reset()
             include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-            universalApk true
+            universalApk false
         }
     }
 
